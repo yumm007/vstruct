@@ -59,33 +59,43 @@ func (g *generator) structEncodeGenerate(st *types.Struct) {
 	fmt.Fprintf(g.buf, "}\n")
 }
 
-func (g *generator) structDecodeGenerate(st *types.Struct) {
-	receiver := strings.ToLower(string(st.Name[0]))
+func filedDecodeGenerate(f *types.Field, r string, ele bool) string {
+	if f.Tag != nil {
+		if f.Tag.Refer != nil {
+			return fmt.Sprintf("ele.decodeFromBuffer(buf)")
+		}
+	}
 
-	fmt.Fprintf(g.buf, "\nfunc (%s *%s)Decode(payload []byte) error {\n", receiver, st.Name)
+	return fmt.Sprintf("binary.Read(buf, binary.LittleEndian, &%s.%s)", r, f.Name)
+}
+
+func (g *generator) structDecodeGenerate(st *types.Struct) {
+	r := strings.ToLower(string(st.Name[0]))
+
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)Decode(payload []byte) error {\n", r, st.Name)
 	fmt.Fprintf(g.buf, "\tbuf := bytes.NewBuffer(payload)\n")
-	fmt.Fprintf(g.buf, "\treturn %s.decodeFromBuffer(buf, payload)\n", receiver)
+	fmt.Fprintf(g.buf, "\treturn %s.decodeFromBuffer(buf)\n", r)
 	fmt.Fprintf(g.buf, "}\n")
 
-	fmt.Fprintf(g.buf, "\nfunc (%s *%s)decodeFromBuffer(buf *bytes.Buffer, payload []byte) error {\n", receiver, st.Name)
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)decodeFromBuffer(buf *bytes.Buffer) error {\n", r, st.Name)
 
 	for _, f := range st.Fields {
 		if f.Tag != nil {
 			if f.Tag.Repeat != nil {
-				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s.%s); i++ {\n", receiver, *f.Tag.Repeat)
+				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s.%s); i++ {\n", r, *f.Tag.Repeat)
 				fmt.Fprintf(g.buf, "\t\tvar ele %s\n", f.DataType[2:])
-				fmt.Fprintf(g.buf, "\t\tif err := binary.Read(buf, binary.LittleEndian, &ele); err != nil {\n")
+				fmt.Fprintf(g.buf, "\t\tif err := %s; err != nil {\n", filedDecodeGenerate(f, r, true))
 				fmt.Fprintf(g.buf, "\t\t\treturn err\n")
 				fmt.Fprintf(g.buf, "\t\t}\n")
-				fmt.Fprintf(g.buf, "\t\t%s.%s = append(%s.%s, ele)\n", receiver, f.Name, receiver, f.Name)
+				fmt.Fprintf(g.buf, "\t\t%s.%s = append(%s.%s, ele)\n", r, f.Name, r, f.Name)
 				fmt.Fprintf(g.buf, "\t}\n")
 			} else {
-				fmt.Fprintf(g.buf, "\tif err := binary.Read(buf, binary.LittleEndian, &%s.%s); err != nil {\n", receiver, f.Name)
+				fmt.Fprintf(g.buf, "\tif err := %s; err != nil {\n", filedDecodeGenerate(f, r, false))
 				fmt.Fprintf(g.buf, "\t\treturn err\n")
 				fmt.Fprintf(g.buf, "\t}\n")
 			}
 		} else {
-			fmt.Fprintf(g.buf, "\tif err := binary.Read(buf, binary.LittleEndian, &%s.%s); err != nil {\n", receiver, f.Name)
+			fmt.Fprintf(g.buf, "\tif err := %s; err != nil {\n", filedDecodeGenerate(f, r, false))
 			fmt.Fprintf(g.buf, "\t\treturn err\n")
 			fmt.Fprintf(g.buf, "\t}\n")
 		}
