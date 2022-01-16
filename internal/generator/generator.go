@@ -28,8 +28,12 @@ func (g *generator) writeHeader() {
 func (g *generator) structEncodeGenerate(st *types.Struct) {
 	receiver := strings.ToLower(string(st.Name[0]))
 
-	fmt.Fprintf(g.buf, "\nfunc (%s *%s)%sEncode() ([]byte, error) {\n", receiver, st.Name, st.Name)
-	fmt.Fprintf(g.buf, "\tbuf := new(bytes.Buffer)\n\n")
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)Encode() ([]byte, error) {\n", receiver, st.Name)
+	fmt.Fprintf(g.buf, "\tbuf := new(bytes.Buffer)\n")
+	fmt.Fprintf(g.buf, "\treturn %s.encodeToBuffer(buf)\n", receiver)
+	fmt.Fprintf(g.buf, "}\n")
+
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)encodeToBuffer(buf *bytes.Buffer) ([]byte, error) {\n", receiver, st.Name)
 
 	for _, f := range st.Fields {
 		if f.Tag != nil {
@@ -58,8 +62,13 @@ func (g *generator) structEncodeGenerate(st *types.Struct) {
 func (g *generator) structDecodeGenerate(st *types.Struct) {
 	receiver := strings.ToLower(string(st.Name[0]))
 
-	fmt.Fprintf(g.buf, "\nfunc (%s *%s)%sDecode(payload []byte) error {\n", receiver, st.Name, st.Name)
-	fmt.Fprintf(g.buf, "\tbuf := bytes.NewBuffer(payload)\n\n")
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)Decode(payload []byte) error {\n", receiver, st.Name)
+	fmt.Fprintf(g.buf, "\tbuf := bytes.NewBuffer(payload)\n")
+	fmt.Fprintf(g.buf, "\treturn %s.decodeFromBuffer(buf, payload)\n", receiver)
+	fmt.Fprintf(g.buf, "}\n")
+
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)decodeFromBuffer(buf *bytes.Buffer, payload []byte) error {\n", receiver, st.Name)
+
 	for _, f := range st.Fields {
 		if f.Tag != nil {
 			if f.Tag.Repeat != nil {
@@ -107,7 +116,7 @@ func Generate(fs afero.Fs, pkg *types.Package, typeName, output, receiverName st
 		}
 	}
 
-	outputFile := g.outputFile(output, pkg.Name, pkg.Dir)
+	outputFile := g.outputFile(output, pkg.Name, typeName, pkg.Dir)
 
 	return afero.WriteFile(fs, outputFile, g.buf.Bytes(), 0644)
 }
@@ -162,7 +171,7 @@ func (g *generator) receiverName(userInput string, structName string) string {
 	return strings.ToLower(string(structName[0]))
 }
 
-func (g *generator) outputFile(output, typeName, dir string) string {
+func (g *generator) outputFile(output, pkgName, typeName, dir string) string {
 	if output == "" {
 		// Use snake_case name of type as output file if output file is not specified.
 		// type TestStruct will be test_struct_accessor.go
@@ -171,7 +180,7 @@ func (g *generator) outputFile(output, typeName, dir string) string {
 
 		name := firstCapMatcher.ReplaceAllString(typeName, "${1}_${2}")
 		name = articleCapMatcher.ReplaceAllString(name, "${1}_${2}")
-		output = strings.ToLower(fmt.Sprintf("%s_vstruct.go", name))
+		output = strings.ToLower(fmt.Sprintf("%s_%s_vstruct.go", pkgName, name))
 	}
 
 	return filepath.Join(dir, output)

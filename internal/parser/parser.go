@@ -19,6 +19,7 @@ const (
 	accessorTag  = "vstruct"
 	ignoreTag    = "-"
 	tagKeyRepeat = "repeat"
+	tagKeyRefer  = "refer"
 )
 
 const (
@@ -116,7 +117,7 @@ func parseTag(tag *ast.BasicLit) *types.Tag {
 		return nil
 	}
 
-	var repeat *string
+	var repeat, refer *string
 
 	tags := strings.Split(tagStr, tagSep)
 	for _, tag := range tags {
@@ -131,8 +132,10 @@ func parseTag(tag *ast.BasicLit) *types.Tag {
 		switch strings.TrimSpace(keyValue[0]) {
 		case tagKeyRepeat:
 			repeat = &value
+		case tagKeyRefer:
+			refer = &value
 		}
 	}
 
-	return &types.Tag{Repeat: repeat}
+	return &types.Tag{Repeat: repeat, Refer: refer}
 }

@@ -31,4 +31,5 @@ type Field struct {
 
 type Tag struct {
 	Repeat *string
+	Refer  *string
 }
