@@ -25,48 +25,66 @@ func (g *generator) writeHeader() {
 	fmt.Fprintf(g.buf, ")\n\n")
 }
 
+func (g *generator) filedEncodeGenerate(f *types.Field, r string, pre string) {
+	defer func() {
+		fmt.Fprintf(g.buf, "%s\t\treturn err\n", pre)
+		fmt.Fprintf(g.buf, "%s\t}\n", pre)
+	}()
+
+	if f.Tag != nil {
+		if f.Tag.Refer != nil {
+			fmt.Fprintf(g.buf, "%s\tif err := %s.%s[i].encodeToBuffer(buf); err != nil {\n", pre, r, f.Name)
+			return
+		}
+	}
+
+	fmt.Fprintf(g.buf, "%s\tif err := binary.Write(buf, binary.LittleEndian, &%s.%s); err != nil {\n", pre, r, f.Name)
+}
+
 func (g *generator) structEncodeGenerate(st *types.Struct) {
 	receiver := strings.ToLower(string(st.Name[0]))
 
 	fmt.Fprintf(g.buf, "\nfunc (%s *%s)Encode() ([]byte, error) {\n", receiver, st.Name)
 	fmt.Fprintf(g.buf, "\tbuf := new(bytes.Buffer)\n")
-	fmt.Fprintf(g.buf, "\treturn %s.encodeToBuffer(buf)\n", receiver)
+	fmt.Fprintf(g.buf, "\tif err := %s.encodeToBuffer(buf); err != nil {\n", receiver)
+	fmt.Fprintf(g.buf, "\t\treturn nil, err\n")
+	fmt.Fprintf(g.buf, "\t}\n")
+	fmt.Fprintf(g.buf, "\treturn buf.Bytes(), nil\n")
 	fmt.Fprintf(g.buf, "}\n")
 
-	fmt.Fprintf(g.buf, "\nfunc (%s *%s)encodeToBuffer(buf *bytes.Buffer) ([]byte, error) {\n", receiver, st.Name)
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)encodeToBuffer(buf *bytes.Buffer) error {\n", receiver, st.Name)
 
 	for _, f := range st.Fields {
 		if f.Tag != nil {
 			if f.Tag.Repeat != nil {
 				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s.%s); i++ {\n", receiver, *f.Tag.Repeat)
-				fmt.Fprintf(g.buf, "\t\tif err := binary.Write(buf, binary.LittleEndian, %s.%s[i]); err != nil {\n", receiver, f.Name)
-				fmt.Fprintf(g.buf, "\t\t\treturn nil, err\n")
-				fmt.Fprintf(g.buf, "\t\t}\n")
+				g.filedEncodeGenerate(f, receiver, "\t")
 				fmt.Fprintf(g.buf, "\t}\n")
-			} else {
-				fmt.Fprintf(g.buf, "\tif err := binary.Write(buf, binary.LittleEndian, %s.%s); err != nil {\n", receiver, f.Name)
-				fmt.Fprintf(g.buf, "\t\treturn nil, err\n")
-				fmt.Fprintf(g.buf, "\t}\n")
+				continue
 			}
-		} else {
-			fmt.Fprintf(g.buf, "\tif err := binary.Write(buf, binary.LittleEndian, %s.%s); err != nil {\n", receiver, f.Name)
-			fmt.Fprintf(g.buf, "\t\treturn nil, err\n")
-			fmt.Fprintf(g.buf, "\t}\n")
 		}
+
+		g.filedEncodeGenerate(f, receiver, "")
 	}
 
-	fmt.Fprintf(g.buf, "\n\treturn buf.Bytes(), nil\n")
+	fmt.Fprintf(g.buf, "\n\treturn nil\n")
 	fmt.Fprintf(g.buf, "}\n")
 }
 
-func filedDecodeGenerate(f *types.Field, r string, ele bool) string {
+func (g *generator) filedDecodeGenerate(f *types.Field, r string, pre string) {
+	defer func() {
+		fmt.Fprintf(g.buf, "%s\t\treturn err\n", pre)
+		fmt.Fprintf(g.buf, "%s\t}\n", pre)
+	}()
+
 	if f.Tag != nil {
 		if f.Tag.Refer != nil {
-			return fmt.Sprintf("ele.decodeFromBuffer(buf)")
+			fmt.Fprintf(g.buf, "%s\tif err := ele.decodeFromBuffer(buf); err != nil {\n", pre)
+			return
 		}
 	}
 
-	return fmt.Sprintf("binary.Read(buf, binary.LittleEndian, &%s.%s)", r, f.Name)
+	fmt.Fprintf(g.buf, "%s\tif err := binary.Read(buf, binary.LittleEndian, &%s.%s); err != nil {\n", pre, r, f.Name)
 }
 
 func (g *generator) structDecodeGenerate(st *types.Struct) {
@@ -84,21 +102,13 @@ func (g *generator) structDecodeGenerate(st *types.Struct) {
 			if f.Tag.Repeat != nil {
 				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s.%s); i++ {\n", r, *f.Tag.Repeat)
 				fmt.Fprintf(g.buf, "\t\tvar ele %s\n", f.DataType[2:])
-				fmt.Fprintf(g.buf, "\t\tif err := %s; err != nil {\n", filedDecodeGenerate(f, r, true))
-				fmt.Fprintf(g.buf, "\t\t\treturn err\n")
-				fmt.Fprintf(g.buf, "\t\t}\n")
+				g.filedDecodeGenerate(f, r, "\t")
 				fmt.Fprintf(g.buf, "\t\t%s.%s = append(%s.%s, ele)\n", r, f.Name, r, f.Name)
 				fmt.Fprintf(g.buf, "\t}\n")
-			} else {
-				fmt.Fprintf(g.buf, "\tif err := %s; err != nil {\n", filedDecodeGenerate(f, r, false))
-				fmt.Fprintf(g.buf, "\t\treturn err\n")
-				fmt.Fprintf(g.buf, "\t}\n")
+				continue
 			}
-		} else {
-			fmt.Fprintf(g.buf, "\tif err := %s; err != nil {\n", filedDecodeGenerate(f, r, false))
-			fmt.Fprintf(g.buf, "\t\treturn err\n")
-			fmt.Fprintf(g.buf, "\t}\n")
 		}
+		g.filedDecodeGenerate(f, r, "")
 	}
 
 	fmt.Fprintf(g.buf, "\n\treturn nil\n")
