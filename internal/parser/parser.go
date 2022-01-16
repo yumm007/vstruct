@@ -92,10 +92,6 @@ func parseStructs(fileSet *token.FileSet, file *ast.File) []*types.Struct {
 func parseFields(st *ast.StructType, fileSet *token.FileSet) []*types.Field {
 	fields := make([]*types.Field, 0)
 	for _, field := range st.Fields.List {
-		if field.Tag == nil {
-			continue
-		}
-
 		name := field.Names[0].Name
 		buf := new(bytes.Buffer)
 		printer.Fprint(buf, fileSet, field.Type)
@@ -111,6 +107,10 @@ func parseFields(st *ast.StructType, fileSet *token.FileSet) []*types.Field {
 }
 
 func parseTag(tag *ast.BasicLit) *types.Tag {
+	if tag == nil {
+		return nil
+	}
+
 	tagStr, ok := reflect.StructTag(strings.Trim(tag.Value, "`")).Lookup(accessorTag)
 	if !ok {
 		return nil

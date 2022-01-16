@@ -18,24 +18,72 @@ type generator struct {
 	buf *bytes.Buffer
 }
 
-func (g *generator) structEncodeGenerate(st *types.Struct) {
-	receiver := strings.ToLower(string(st.Name[0]))
-
+func (g *generator) writeHeader() {
 	fmt.Fprintf(g.buf, "import (\n")
 	fmt.Fprintf(g.buf, "\t\"bytes\"\n")
 	fmt.Fprintf(g.buf, "\t\"encoding/binary\"\n")
 	fmt.Fprintf(g.buf, ")\n\n")
-	fmt.Fprintf(g.buf, "func (%s *%s)%sEncode() ([]byte, error) {\n", receiver, st.Name, st.Name)
+}
+
+func (g *generator) structEncodeGenerate(st *types.Struct) {
+	receiver := strings.ToLower(string(st.Name[0]))
+
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)%sEncode() ([]byte, error) {\n", receiver, st.Name, st.Name)
 	fmt.Fprintf(g.buf, "\tbuf := new(bytes.Buffer)\n\n")
 
 	for _, f := range st.Fields {
-		fmt.Fprintf(g.buf, "\tif err := binary.Write(buf, binary.LittleEndian, %s.%s); err != nil {\n", receiver, f.Name)
-		fmt.Fprintf(g.buf, "\t\treturn nil, err\n")
-		fmt.Fprintf(g.buf, "\t}\n")
+		if f.Tag != nil {
+			if f.Tag.Repeat != nil {
+				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s.%s); i++ {\n", receiver, *f.Tag.Repeat)
+				fmt.Fprintf(g.buf, "\t\tif err := binary.Write(buf, binary.LittleEndian, %s.%s[i]); err != nil {\n", receiver, f.Name)
+				fmt.Fprintf(g.buf, "\t\t\treturn nil, err\n")
+				fmt.Fprintf(g.buf, "\t\t}\n")
+				fmt.Fprintf(g.buf, "\t}\n")
+			} else {
+				fmt.Fprintf(g.buf, "\tif err := binary.Write(buf, binary.LittleEndian, %s.%s); err != nil {\n", receiver, f.Name)
+				fmt.Fprintf(g.buf, "\t\treturn nil, err\n")
+				fmt.Fprintf(g.buf, "\t}\n")
+			}
+		} else {
+			fmt.Fprintf(g.buf, "\tif err := binary.Write(buf, binary.LittleEndian, %s.%s); err != nil {\n", receiver, f.Name)
+			fmt.Fprintf(g.buf, "\t\treturn nil, err\n")
+			fmt.Fprintf(g.buf, "\t}\n")
+		}
 	}
 
 	fmt.Fprintf(g.buf, "\n\treturn buf.Bytes(), nil\n")
-	fmt.Fprintf(g.buf, "}")
+	fmt.Fprintf(g.buf, "}\n")
+}
+
+func (g *generator) structDecodeGenerate(st *types.Struct) {
+	receiver := strings.ToLower(string(st.Name[0]))
+
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)%sDecode(payload []byte) error {\n", receiver, st.Name, st.Name)
+	fmt.Fprintf(g.buf, "\tbuf := bytes.NewBuffer(payload)\n\n")
+	for _, f := range st.Fields {
+		if f.Tag != nil {
+			if f.Tag.Repeat != nil {
+				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s.%s); i++ {\n", receiver, *f.Tag.Repeat)
+				fmt.Fprintf(g.buf, "\t\tvar ele %s\n", f.DataType[2:])
+				fmt.Fprintf(g.buf, "\t\tif err := binary.Read(buf, binary.LittleEndian, &ele); err != nil {\n")
+				fmt.Fprintf(g.buf, "\t\t\treturn err\n")
+				fmt.Fprintf(g.buf, "\t\t}\n")
+				fmt.Fprintf(g.buf, "\t\t%s.%s = append(%s.%s, ele)\n", receiver, f.Name, receiver, f.Name)
+				fmt.Fprintf(g.buf, "\t}\n")
+			} else {
+				fmt.Fprintf(g.buf, "\tif err := binary.Read(buf, binary.LittleEndian, &%s.%s); err != nil {\n", receiver, f.Name)
+				fmt.Fprintf(g.buf, "\t\treturn err\n")
+				fmt.Fprintf(g.buf, "\t}\n")
+			}
+		} else {
+			fmt.Fprintf(g.buf, "\tif err := binary.Read(buf, binary.LittleEndian, &%s.%s); err != nil {\n", receiver, f.Name)
+			fmt.Fprintf(g.buf, "\t\treturn err\n")
+			fmt.Fprintf(g.buf, "\t}\n")
+		}
+	}
+
+	fmt.Fprintf(g.buf, "\n\treturn nil\n")
+	fmt.Fprintf(g.buf, "}\n")
 }
 
 // Generate generates a file and accessor methods in it.
@@ -47,6 +95,7 @@ func Generate(fs afero.Fs, pkg *types.Package, typeName, output, receiverName st
 	g.printf("package %s\n", pkg.Name)
 	g.printf("\n")
 
+	g.writeHeader()
 	for _, file := range pkg.Files {
 		for _, st := range file.Structs {
 			if st.Name != typeName {
@@ -54,6 +103,7 @@ func Generate(fs afero.Fs, pkg *types.Package, typeName, output, receiverName st
 			}
 			// 遍历结构体
 			g.structEncodeGenerate(st)
+			g.structDecodeGenerate(st)
 		}
 	}
 
