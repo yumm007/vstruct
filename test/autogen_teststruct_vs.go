@@ -25,8 +25,12 @@ func (s *Simples)encodeToBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (s *Simples)Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
+func (s *Simples)Encode(buf *bytes.Buffer) ([]byte, error) {
+	if buf == nil {
+		buf = new(bytes.Buffer)
+	} else {
+		buf.Reset()
+	}
 	if err := s.encodeToBuffer(buf); err != nil {
 		return nil, err
 	}
@@ -72,8 +76,12 @@ func (u *UnionSim)encodeToBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSim)Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
+func (u *UnionSim)Encode(buf *bytes.Buffer) ([]byte, error) {
+	if buf == nil {
+		buf = new(bytes.Buffer)
+	} else {
+		buf.Reset()
+	}
 	if err := u.encodeToBuffer(buf); err != nil {
 		return nil, err
 	}
@@ -117,8 +125,12 @@ func (u *UnionSim2)encodeToBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSim2)Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
+func (u *UnionSim2)Encode(buf *bytes.Buffer) ([]byte, error) {
+	if buf == nil {
+		buf = new(bytes.Buffer)
+	} else {
+		buf.Reset()
+	}
 	if err := u.encodeToBuffer(buf); err != nil {
 		return nil, err
 	}
