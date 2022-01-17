@@ -149,24 +149,33 @@ func (g *generator) structDecodeGenerate(st *Struct) {
 }
 
 // Generate a file and accessor methods in it.
-func Generate(pkg *Package, typeName string, output string, receiverName string) error {
+func Generate(pkg *Package, typeList []string, output string, receiverName string) error {
 	g := generator{buf: new(bytes.Buffer), headBuf: new(bytes.Buffer), receiver: receiverName}
 
 	for _, file := range pkg.Files {
 		for _, st := range file.Structs {
-			if st.Name != typeName {
-				continue
+
+			for _, typeName := range typeList {
+				if st.Name == typeName {
+					g.structEncodeGenerate(st)
+					g.structDecodeGenerate(st)
+					break
+				}
 			}
-			// 遍历结构体
-			g.structEncodeGenerate(st)
-			g.structDecodeGenerate(st)
+
 		}
 	}
 
 	// 后写，因为涉及到动态import
 	g.writeHeader(pkg.Name)
 	_, _ = g.headBuf.ReadFrom(g.buf)
-	outputFile := g.outputFile(output, pkg.Name, typeName, pkg.Dir)
+
+	pkgName := pkg.Name
+	if len(typeList) == 1 {
+		pkgName = typeList[0]
+	}
+
+	outputFile := g.outputFile(output, pkg.Name, pkgName, pkg.Dir)
 
 	return os.WriteFile(outputFile, g.headBuf.Bytes(), 0644)
 }

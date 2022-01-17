@@ -1,4 +1,4 @@
-package vstruct
+package main
 
 import (
 	"flag"
@@ -6,6 +6,7 @@ import (
 	"github.com/yumm007/vstruct/cmd"
 	"log"
 	"os"
+	"strings"
 )
 
 // Version is the version of `accessory`, injected at build time.
@@ -38,9 +39,9 @@ func main() {
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	flags.Usage = newUsage(flags)
 	version := flags.Bool("version", false, "show the version of vstruct")
-	structName := flags.String("struct", "", "struct name; must be set")
+	structName := flags.String("struct", "", "struct name; split by dot if generate more struct")
 	receiver := flags.String("receiver", "", "receiver name; default first letter of struct name")
-	output := flags.String("output", "", "output file name; default autogen_<struct_name>_vs.go")
+	output := flags.String("output", "", "output file name; default autogen_<pkg_name/struct_name>_vs.go")
 
 	if err := flags.Parse(args[1:]); err != nil {
 		flags.Usage()
@@ -56,6 +57,8 @@ func main() {
 		flags.Usage()
 		os.Exit(1)
 	}
+
+	structList := strings.Split(*structName, ",")
 
 	var dir string
 	if cliArgs := flags.Args(); len(cliArgs) > 0 {
@@ -78,7 +81,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = cmd.Generate(pkg, *structName, *output, *receiver); err != nil {
+	if err = cmd.Generate(pkg, structList, *output, *receiver); err != nil {
 		log.Fatal(err)
 	}
 }
