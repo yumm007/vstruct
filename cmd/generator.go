@@ -70,7 +70,11 @@ func (g *generator) structEncodeGenerate(st *Struct) {
 		}
 		if f.Tag != nil {
 			if f.Tag.Repeat != nil {
-				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s.%s); i++ {\n", r, *f.Tag.Repeat)
+				acc := "int"
+				if f.Tag.Access != nil {
+					acc = *f.Tag.Access
+				}
+				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s(%s.%s)); i++ {\n", acc, r, *f.Tag.Repeat)
 				g.filedEncodeGenerate(f, r, "\t")
 				fmt.Fprintf(g.buf, "\t}\n")
 				continue
@@ -132,7 +136,11 @@ func (g *generator) structDecodeGenerate(st *Struct) {
 
 		if f.Tag != nil {
 			if f.Tag.Repeat != nil {
-				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s.%s); i++ {\n", r, *f.Tag.Repeat)
+				acc := "int"
+				if f.Tag.Access != nil {
+					acc = *f.Tag.Access
+				}
+				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s(%s.%s)); i++ {\n", acc, r, *f.Tag.Repeat)
 				fmt.Fprintf(g.buf, "\t\tvar ele %s\n", f.DataType[2:])
 				g.filedDecodeGenerate(f, r, "\t")
 				fmt.Fprintf(g.buf, "\t\t%s.%s = append(%s.%s, ele)\n", r, f.Name, r, f.Name)

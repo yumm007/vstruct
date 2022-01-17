@@ -19,6 +19,7 @@ const (
 	tagKeyRepeat = "repeat"
 	tagKeyRefer  = "refer"
 	tagKeyCrc16  = "crc16"
+	tagKeyAccess = "access"
 )
 
 const (
@@ -52,6 +53,7 @@ type Tag struct {
 	Repeat *string
 	Refer  *string
 	Crc16  *string
+	Access *string
 }
 
 // ParsePackage parses the specified directory's package.
@@ -143,7 +145,7 @@ func parseTag(tag *ast.BasicLit) *Tag {
 		return nil
 	}
 
-	var repeat, refer, crc16 *string
+	var repeat, refer, crc16, access *string
 
 	tags := strings.Split(tagStr, tagSep)
 	for _, tag := range tags {
@@ -162,8 +164,10 @@ func parseTag(tag *ast.BasicLit) *Tag {
 			refer = &value
 		case tagKeyCrc16:
 			crc16 = &value
+		case tagKeyAccess:
+			access = &value
 		}
 	}
 
-	return &Tag{Repeat: repeat, Refer: refer, Crc16: crc16}
+	return &Tag{Repeat: repeat, Refer: refer, Crc16: crc16, Access: access}
 }
