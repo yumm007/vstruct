@@ -1,4 +1,4 @@
-module vstruct
+module github.com/yumm007/vstruct
 
 go 1.17
 
