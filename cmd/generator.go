@@ -45,6 +45,9 @@ func (g *generator) filedEncodeGenerate(f *Field, r string, pre string) {
 				fmt.Fprintf(g.buf, "%s\tif err := %s.%s.encodeToBuffer(buf); err != nil {\n", pre, r, f.Name)
 			}
 			return
+		} else if f.Tag.Repeat != nil {
+			fmt.Fprintf(g.buf, "%s\tif err := binary.Write(buf, binary.LittleEndian, &%s.%s[i]); err != nil {\n", pre, r, f.Name)
+			return
 		}
 	}
 
@@ -114,6 +117,9 @@ func (g *generator) filedDecodeGenerate(f *Field, r string, pre string) {
 				fmt.Fprintf(g.buf, "%s\tif err := %s.%s.decodeFromBuffer(buf); err != nil {\n", pre, r, f.Name)
 			}
 
+			return
+		} else if f.Tag.Repeat != nil {
+			fmt.Fprintf(g.buf, "%s\tif err := binary.Read(buf, binary.LittleEndian, &ele); err != nil {\n", pre)
 			return
 		}
 	}

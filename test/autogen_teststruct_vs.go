@@ -17,7 +17,7 @@ func (s *Simples)encodeToBuffer(buf *bytes.Buffer) error {
 		return err
 	}
 	for i := 0; i < int(lenCov(s.NameLen)); i++ {
-		if err := binary.Write(buf, binary.LittleEndian, &s.Name); err != nil {
+		if err := binary.Write(buf, binary.LittleEndian, &s.Name[i]); err != nil {
 			return err
 		}
 	}
@@ -46,7 +46,7 @@ func (s *Simples)decodeFromBuffer(buf *bytes.Buffer) error {
 	}
 	for i := 0; i < int(lenCov(s.NameLen)); i++ {
 		var ele uint8
-		if err := binary.Read(buf, binary.LittleEndian, &s.Name); err != nil {
+		if err := binary.Read(buf, binary.LittleEndian, &ele); err != nil {
 			return err
 		}
 		s.Name = append(s.Name, ele)
