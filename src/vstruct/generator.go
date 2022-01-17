@@ -152,7 +152,7 @@ func (g *generator) outputFile(output, pkgName, typeName, dir string) string {
 
 		name := firstCapMatcher.ReplaceAllString(typeName, "${1}_${2}")
 		name = articleCapMatcher.ReplaceAllString(name, "${1}_${2}")
-		output = strings.ToLower(fmt.Sprintf("%s_%s_vstruct.go", pkgName, name))
+		output = strings.ToLower(fmt.Sprintf("autogen_%s_vs.go", name))
 	}
 
 	return filepath.Join(dir, output)

@@ -40,7 +40,7 @@ func main() {
 	version := flags.Bool("version", false, "show the version of vstruct")
 	structName := flags.String("struct", "", "struct name; must be set")
 	receiver := flags.String("receiver", "", "receiver name; default first letter of struct name")
-	output := flags.String("output", "", "output file name; default <package_name>_<struct_name>_vstruct.go")
+	output := flags.String("output", "", "output file name; default autogen_<struct_name>_vs.go")
 
 	if err := flags.Parse(args[1:]); err != nil {
 		flags.Usage()
