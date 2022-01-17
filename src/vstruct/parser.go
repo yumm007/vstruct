@@ -18,6 +18,7 @@ const (
 	ignoreTag    = "-"
 	tagKeyRepeat = "repeat"
 	tagKeyRefer  = "refer"
+	tagKeyCrc16  = "crc16"
 )
 
 const (
@@ -50,6 +51,7 @@ type Field struct {
 type Tag struct {
 	Repeat *string
 	Refer  *string
+	Crc16  *string
 }
 
 // ParsePackage parses the specified directory's package.
@@ -141,7 +143,7 @@ func parseTag(tag *ast.BasicLit) *Tag {
 		return nil
 	}
 
-	var repeat, refer *string
+	var repeat, refer, crc16 *string
 
 	tags := strings.Split(tagStr, tagSep)
 	for _, tag := range tags {
@@ -158,8 +160,10 @@ func parseTag(tag *ast.BasicLit) *Tag {
 			repeat = &value
 		case tagKeyRefer:
 			refer = &value
+		case tagKeyCrc16:
+			crc16 = &value
 		}
 	}
 
-	return &Tag{Repeat: repeat, Refer: refer}
+	return &Tag{Repeat: repeat, Refer: refer, Crc16: crc16}
 }

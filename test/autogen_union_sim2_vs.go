@@ -5,6 +5,7 @@ package teststruct
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/yumm007/gohash"
 )
 
 
@@ -23,7 +24,7 @@ func (u *UnionSim2)encodeToBuffer(buf *bytes.Buffer) error {
 	if err := u.Arr.encodeToBuffer(buf); err != nil {
 		return err
 	}
-	if err := binary.Write(buf, binary.LittleEndian, &u.Crc); err != nil {
+	if err := binary.Write(buf, binary.LittleEndian, gohash.Crc16ccitt(buf.Bytes())); err != nil {
 		return err
 	}
 

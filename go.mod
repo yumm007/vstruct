@@ -2,7 +2,10 @@ module vstruct
 
 go 1.17
 
-require golang.org/x/tools v0.1.7
+require (
+	github.com/yumm007/gohash v0.1.1
+	golang.org/x/tools v0.1.7
+)
 
 require (
 	golang.org/x/mod v0.4.2 // indirect
