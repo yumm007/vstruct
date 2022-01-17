@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/yumm007/vstruct"
 	"log"
 	"os"
-	"vstruct/src/vstruct"
 )
 
 // Version is the version of `accessory`, injected at build time.
