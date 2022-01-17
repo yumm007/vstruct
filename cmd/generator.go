@@ -62,14 +62,6 @@ func (g *generator) structEncodeGenerate(st *Struct) {
 		r = g.receiver
 	}
 
-	fmt.Fprintf(g.buf, "\nfunc (%s *%s)Encode() ([]byte, error) {\n", r, st.Name)
-	fmt.Fprintf(g.buf, "\tbuf := new(bytes.Buffer)\n")
-	fmt.Fprintf(g.buf, "\tif err := %s.encodeToBuffer(buf); err != nil {\n", r)
-	fmt.Fprintf(g.buf, "\t\treturn nil, err\n")
-	fmt.Fprintf(g.buf, "\t}\n")
-	fmt.Fprintf(g.buf, "\treturn buf.Bytes(), nil\n")
-	fmt.Fprintf(g.buf, "}\n")
-
 	fmt.Fprintf(g.buf, "\nfunc (%s *%s)encodeToBuffer(buf *bytes.Buffer) error {\n", r, st.Name)
 
 	for _, f := range st.Fields {
@@ -89,6 +81,14 @@ func (g *generator) structEncodeGenerate(st *Struct) {
 	}
 
 	fmt.Fprintf(g.buf, "\n\treturn nil\n")
+	fmt.Fprintf(g.buf, "}\n")
+
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)Encode() ([]byte, error) {\n", r, st.Name)
+	fmt.Fprintf(g.buf, "\tbuf := new(bytes.Buffer)\n")
+	fmt.Fprintf(g.buf, "\tif err := %s.encodeToBuffer(buf); err != nil {\n", r)
+	fmt.Fprintf(g.buf, "\t\treturn nil, err\n")
+	fmt.Fprintf(g.buf, "\t}\n")
+	fmt.Fprintf(g.buf, "\treturn buf.Bytes(), nil\n")
 	fmt.Fprintf(g.buf, "}\n")
 }
 
@@ -119,11 +119,6 @@ func (g *generator) structDecodeGenerate(st *Struct) {
 		r = g.receiver
 	}
 
-	fmt.Fprintf(g.buf, "\nfunc (%s *%s)Decode(payload []byte) error {\n", r, st.Name)
-	fmt.Fprintf(g.buf, "\tbuf := bytes.NewBuffer(payload)\n")
-	fmt.Fprintf(g.buf, "\treturn %s.decodeFromBuffer(buf)\n", r)
-	fmt.Fprintf(g.buf, "}\n")
-
 	fmt.Fprintf(g.buf, "\nfunc (%s *%s)decodeFromBuffer(buf *bytes.Buffer) error {\n", r, st.Name)
 
 	for _, f := range st.Fields {
@@ -145,6 +140,11 @@ func (g *generator) structDecodeGenerate(st *Struct) {
 	}
 
 	fmt.Fprintf(g.buf, "\n\treturn nil\n")
+	fmt.Fprintf(g.buf, "}\n")
+
+	fmt.Fprintf(g.buf, "\nfunc (%s *%s)Decode(payload []byte) error {\n", r, st.Name)
+	fmt.Fprintf(g.buf, "\tbuf := bytes.NewBuffer(payload)\n")
+	fmt.Fprintf(g.buf, "\treturn %s.decodeFromBuffer(buf)\n", r)
 	fmt.Fprintf(g.buf, "}\n")
 }
 

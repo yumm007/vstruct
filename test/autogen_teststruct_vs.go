@@ -9,14 +9,6 @@ import (
 )
 
 
-func (s *Simples)Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
-	if err := s.encodeToBuffer(buf); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
 func (s *Simples)encodeToBuffer(buf *bytes.Buffer) error {
 	if err := binary.Write(buf, binary.LittleEndian, &s.Id); err != nil {
 		return err
@@ -33,9 +25,12 @@ func (s *Simples)encodeToBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (s *Simples)Decode(payload []byte) error {
-	buf := bytes.NewBuffer(payload)
-	return s.decodeFromBuffer(buf)
+func (s *Simples)Encode() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	if err := s.encodeToBuffer(buf); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 func (s *Simples)decodeFromBuffer(buf *bytes.Buffer) error {
@@ -56,12 +51,9 @@ func (s *Simples)decodeFromBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSim)Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
-	if err := u.encodeToBuffer(buf); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+func (s *Simples)Decode(payload []byte) error {
+	buf := bytes.NewBuffer(payload)
+	return s.decodeFromBuffer(buf)
 }
 
 func (u *UnionSim)encodeToBuffer(buf *bytes.Buffer) error {
@@ -80,9 +72,12 @@ func (u *UnionSim)encodeToBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSim)Decode(payload []byte) error {
-	buf := bytes.NewBuffer(payload)
-	return u.decodeFromBuffer(buf)
+func (u *UnionSim)Encode() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	if err := u.encodeToBuffer(buf); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 func (u *UnionSim)decodeFromBuffer(buf *bytes.Buffer) error {
@@ -103,12 +98,9 @@ func (u *UnionSim)decodeFromBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSim2)Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
-	if err := u.encodeToBuffer(buf); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+func (u *UnionSim)Decode(payload []byte) error {
+	buf := bytes.NewBuffer(payload)
+	return u.decodeFromBuffer(buf)
 }
 
 func (u *UnionSim2)encodeToBuffer(buf *bytes.Buffer) error {
@@ -125,9 +117,12 @@ func (u *UnionSim2)encodeToBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSim2)Decode(payload []byte) error {
-	buf := bytes.NewBuffer(payload)
-	return u.decodeFromBuffer(buf)
+func (u *UnionSim2)Encode() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	if err := u.encodeToBuffer(buf); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 func (u *UnionSim2)decodeFromBuffer(buf *bytes.Buffer) error {
@@ -142,4 +137,9 @@ func (u *UnionSim2)decodeFromBuffer(buf *bytes.Buffer) error {
 	}
 
 	return nil
+}
+
+func (u *UnionSim2)Decode(payload []byte) error {
+	buf := bytes.NewBuffer(payload)
+	return u.decodeFromBuffer(buf)
 }
