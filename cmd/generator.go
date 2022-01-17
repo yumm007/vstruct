@@ -1,4 +1,4 @@
-package vstruct
+package cmd
 
 import (
 	"bytes"

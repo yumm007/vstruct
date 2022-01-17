@@ -1,9 +1,9 @@
-package main
+package vstruct
 
 import (
 	"flag"
 	"fmt"
-	"github.com/yumm007/vstruct"
+	"github.com/yumm007/vstruct/cmd"
 	"log"
 	"os"
 )
@@ -71,14 +71,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	pkg, err := vstruct.ParsePackage(dir)
+	pkg, err := cmd.ParsePackage(dir)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		flags.Usage()
 		os.Exit(1)
 	}
 
-	if err = vstruct.Generate(pkg, *structName, *output, *receiver); err != nil {
+	if err = cmd.Generate(pkg, *structName, *output, *receiver); err != nil {
 		log.Fatal(err)
 	}
 }
