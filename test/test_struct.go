@@ -13,3 +13,10 @@ type UnionSim struct {
 	Arr []Simples `vstruct:"repeat:Len,refer:true"`
 	Crc uint16
 }
+
+//go:generate vstruct -struct=UnionSim2
+type UnionSim2 struct {
+	Len uint8
+	Arr Simples `vstruct:"refer:true"`
+	Crc uint16
+}

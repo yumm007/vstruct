@@ -29,7 +29,11 @@ func (g *generator) filedEncodeGenerate(f *Field, r string, pre string) {
 
 	if f.Tag != nil {
 		if f.Tag.Refer != nil {
-			fmt.Fprintf(g.buf, "%s\tif err := %s.%s[i].encodeToBuffer(buf); err != nil {\n", pre, r, f.Name)
+			if f.Tag.Repeat != nil {
+				fmt.Fprintf(g.buf, "%s\tif err := %s.%s[i].encodeToBuffer(buf); err != nil {\n", pre, r, f.Name)
+			} else {
+				fmt.Fprintf(g.buf, "%s\tif err := %s.%s.encodeToBuffer(buf); err != nil {\n", pre, r, f.Name)
+			}
 			return
 		}
 	}
@@ -78,7 +82,12 @@ func (g *generator) filedDecodeGenerate(f *Field, r string, pre string) {
 
 	if f.Tag != nil {
 		if f.Tag.Refer != nil {
-			fmt.Fprintf(g.buf, "%s\tif err := ele.decodeFromBuffer(buf); err != nil {\n", pre)
+			if f.Tag.Repeat != nil {
+				fmt.Fprintf(g.buf, "%s\tif err := ele.decodeFromBuffer(buf); err != nil {\n", pre)
+			} else {
+				fmt.Fprintf(g.buf, "%s\tif err := %s.%s.decodeFromBuffer(buf); err != nil {\n", pre, r, f.Name)
+			}
+
 			return
 		}
 	}
