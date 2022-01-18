@@ -9,7 +9,7 @@ import (
 )
 
 
-func (s *Simples)encodeToBuffer(buf *bytes.Buffer) error {
+func (s *Simples) encodeToBuffer(buf *bytes.Buffer) error {
 	if err := binary.Write(buf, binary.LittleEndian, &s.Id); err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func (s *Simples)encodeToBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (s *Simples)Encode(buf *bytes.Buffer) ([]byte, error) {
+func (s *Simples) Encode(buf *bytes.Buffer) ([]byte, error) {
 	if buf == nil {
 		buf = new(bytes.Buffer)
 	} else {
@@ -37,7 +37,7 @@ func (s *Simples)Encode(buf *bytes.Buffer) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (s *Simples)decodeFromBuffer(buf *bytes.Buffer) error {
+func (s *Simples) decodeFromBuffer(buf *bytes.Buffer) error {
 	if err := binary.Read(buf, binary.LittleEndian, &s.Id); err != nil {
 		return err
 	}
@@ -58,12 +58,12 @@ func (s *Simples)decodeFromBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (s *Simples)Decode(payload []byte) error {
+func (s *Simples) Decode(payload []byte) error {
 	buf := bytes.NewBuffer(payload)
 	return s.decodeFromBuffer(buf)
 }
 
-func (u *UnionSim)encodeToBuffer(buf *bytes.Buffer) error {
+func (u *UnionSim) encodeToBuffer(buf *bytes.Buffer) error {
 	if err := binary.Write(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func (u *UnionSim)encodeToBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSim)Encode(buf *bytes.Buffer) ([]byte, error) {
+func (u *UnionSim) Encode(buf *bytes.Buffer) ([]byte, error) {
 	if buf == nil {
 		buf = new(bytes.Buffer)
 	} else {
@@ -91,7 +91,7 @@ func (u *UnionSim)Encode(buf *bytes.Buffer) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (u *UnionSim)decodeFromBuffer(buf *bytes.Buffer) error {
+func (u *UnionSim) decodeFromBuffer(buf *bytes.Buffer) error {
 	if err := binary.Read(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
@@ -112,12 +112,12 @@ func (u *UnionSim)decodeFromBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSim)Decode(payload []byte) error {
+func (u *UnionSim) Decode(payload []byte) error {
 	buf := bytes.NewBuffer(payload)
 	return u.decodeFromBuffer(buf)
 }
 
-func (u *UnionSim2)encodeToBuffer(buf *bytes.Buffer) error {
+func (u *UnionSim2) encodeToBuffer(buf *bytes.Buffer) error {
 	if err := binary.Write(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
@@ -131,7 +131,7 @@ func (u *UnionSim2)encodeToBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSim2)Encode(buf *bytes.Buffer) ([]byte, error) {
+func (u *UnionSim2) Encode(buf *bytes.Buffer) ([]byte, error) {
 	if buf == nil {
 		buf = new(bytes.Buffer)
 	} else {
@@ -143,7 +143,7 @@ func (u *UnionSim2)Encode(buf *bytes.Buffer) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (u *UnionSim2)decodeFromBuffer(buf *bytes.Buffer) error {
+func (u *UnionSim2) decodeFromBuffer(buf *bytes.Buffer) error {
 	if err := binary.Read(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
@@ -157,12 +157,12 @@ func (u *UnionSim2)decodeFromBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSim2)Decode(payload []byte) error {
+func (u *UnionSim2) Decode(payload []byte) error {
 	buf := bytes.NewBuffer(payload)
 	return u.decodeFromBuffer(buf)
 }
 
-func (u *UnionSimAcc)encodeToBuffer(buf *bytes.Buffer) error {
+func (u *UnionSimAcc) encodeToBuffer(buf *bytes.Buffer) error {
 	if err := binary.Write(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
@@ -176,7 +176,7 @@ func (u *UnionSimAcc)encodeToBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSimAcc)Encode(buf *bytes.Buffer) ([]byte, error) {
+func (u *UnionSimAcc) Encode(buf *bytes.Buffer) ([]byte, error) {
 	if buf == nil {
 		buf = new(bytes.Buffer)
 	} else {
@@ -188,7 +188,7 @@ func (u *UnionSimAcc)Encode(buf *bytes.Buffer) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (u *UnionSimAcc)decodeFromBuffer(buf *bytes.Buffer) error {
+func (u *UnionSimAcc) decodeFromBuffer(buf *bytes.Buffer) error {
 	if err := binary.Read(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
@@ -202,7 +202,7 @@ func (u *UnionSimAcc)decodeFromBuffer(buf *bytes.Buffer) error {
 	return nil
 }
 
-func (u *UnionSimAcc)Decode(payload []byte) error {
+func (u *UnionSimAcc) Decode(payload []byte) error {
 	buf := bytes.NewBuffer(payload)
 	return u.decodeFromBuffer(buf)
 }
