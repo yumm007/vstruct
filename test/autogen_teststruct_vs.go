@@ -44,7 +44,10 @@ func (s *Simples)decodeFromBuffer(buf *bytes.Buffer) error {
 	if err := binary.Read(buf, binary.LittleEndian, &s.NameLen); err != nil {
 		return err
 	}
-	for i := 0; i < int(lenCov(s.NameLen)); i++ {
+
+	ele_len := int(lenCov(s.NameLen))
+	s.Name = make([]uint8, 0, ele_len)
+	for i := 0; i < ele_len; i++ {
 		var ele uint8
 		if err := binary.Read(buf, binary.LittleEndian, &ele); err != nil {
 			return err
@@ -92,7 +95,10 @@ func (u *UnionSim)decodeFromBuffer(buf *bytes.Buffer) error {
 	if err := binary.Read(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
-	for i := 0; i < int(int(u.Len)); i++ {
+
+	ele_len := int(int(u.Len))
+	u.Arr = make([]Simples, 0, ele_len)
+	for i := 0; i < ele_len; i++ {
 		var ele Simples
 		if err := ele.decodeFromBuffer(buf); err != nil {
 			return err

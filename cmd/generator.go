@@ -146,7 +146,9 @@ func (g *generator) structDecodeGenerate(st *Struct) {
 				if f.Tag.Access != nil {
 					acc = *f.Tag.Access
 				}
-				fmt.Fprintf(g.buf, "\tfor i := 0; i < int(%s(%s.%s)); i++ {\n", acc, r, *f.Tag.Repeat)
+				fmt.Fprintf(g.buf, "\n\tele_len := int(%s(%s.%s))\n", acc, r, *f.Tag.Repeat)
+				fmt.Fprintf(g.buf, "\t%s.%s = make(%s, 0, ele_len)\n", r, f.Name, f.DataType)
+				fmt.Fprintf(g.buf, "\tfor i := 0; i < ele_len; i++ {\n")
 				fmt.Fprintf(g.buf, "\t\tvar ele %s\n", f.DataType[2:])
 				g.filedDecodeGenerate(f, r, "\t")
 				fmt.Fprintf(g.buf, "\t\t%s.%s = append(%s.%s, ele)\n", r, f.Name, r, f.Name)
