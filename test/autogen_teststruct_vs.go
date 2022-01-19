@@ -206,3 +206,47 @@ func (u *UnionSimAcc) Decode(payload []byte) error {
 	buf := bytes.NewBuffer(payload)
 	return u.decodeFromBuffer(buf)
 }
+
+func (u *UnionString) encodeToBuffer(buf *bytes.Buffer) error {
+	UidEle := make([]uint8, 0, 20)
+	copy(UidEle, u.Uid)
+	if err := binary.Write(buf, binary.LittleEndian, UidEle); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, &u.Size); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *UnionString) Encode(buf *bytes.Buffer) ([]byte, error) {
+	if buf == nil {
+		buf = new(bytes.Buffer)
+	} else {
+		buf.Reset()
+	}
+	if err := u.encodeToBuffer(buf); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func (u *UnionString) decodeFromBuffer(buf *bytes.Buffer) error {
+	UidEle := make([]uint8, 0, 20)
+	if err := binary.Read(buf, binary.LittleEndian, &UidEle); err == nil {
+		u.Uid = strings.TrimRight(string(UidEle), string(rune(0)))
+	} else {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &u.Size); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *UnionString) Decode(payload []byte) error {
+	buf := bytes.NewBuffer(payload)
+	return u.decodeFromBuffer(buf)
+}

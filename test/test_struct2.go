@@ -11,3 +11,8 @@ type UnionSimAcc struct {
 	Size uint16
 	Crc  uint16 `vstruct:"crc16:true"`
 }
+
+type UnionString struct {
+	Uid  string `vstruct:"size:20"`
+	Size uint16
+}

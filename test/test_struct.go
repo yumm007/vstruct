@@ -1,6 +1,6 @@
 package teststruct
 
-//go:generate vstruct -struct=Simples,UnionSim,UnionSim2,UnionSimAcc
+//go:generate vstruct -struct=Simples,UnionSim,UnionSim2,UnionSimAcc,UnionString
 
 func lenCov(len uint8) uint8 {
 	return len & 0x3F
