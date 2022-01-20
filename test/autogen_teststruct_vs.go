@@ -46,7 +46,7 @@ func (s *Simples) decodeFromBuffer(buf *bytes.Buffer) error {
 	}
 
 	ele_len := int(lenCov(s.NameLen))
-	s.Name = make([]uint8, 0, ele_len)
+	s.Name = make([]uint8, ele_len)
 	for i := 0; i < ele_len; i++ {
 		var ele uint8
 		if err := binary.Read(buf, binary.LittleEndian, &ele); err != nil {
@@ -97,7 +97,7 @@ func (u *UnionSim) decodeFromBuffer(buf *bytes.Buffer) error {
 	}
 
 	ele_len := int(int(u.Len))
-	u.Arr = make([]Simples, 0, ele_len)
+	u.Arr = make([]Simples, ele_len)
 	for i := 0; i < ele_len; i++ {
 		var ele Simples
 		if err := ele.decodeFromBuffer(buf); err != nil {
@@ -208,7 +208,7 @@ func (u *UnionSimAcc) Decode(payload []byte) error {
 }
 
 func (u *UnionString) encodeToBuffer(buf *bytes.Buffer) error {
-	UidEle := make([]uint8, 0, 20)
+	UidEle := make([]uint8, 20)
 	copy(UidEle, u.Uid)
 	if err := binary.Write(buf, binary.LittleEndian, UidEle); err != nil {
 		return err
@@ -233,7 +233,7 @@ func (u *UnionString) Encode(buf *bytes.Buffer) ([]byte, error) {
 }
 
 func (u *UnionString) decodeFromBuffer(buf *bytes.Buffer) error {
-	UidEle := make([]uint8, 0, 20)
+	UidEle := make([]uint8, 20)
 	if err := binary.Read(buf, binary.LittleEndian, &UidEle); err == nil {
 		u.Uid = strings.TrimRight(string(UidEle), string(rune(0)))
 	} else {

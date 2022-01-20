@@ -57,7 +57,7 @@ func (g *generator) filedEncodeGenerate(f *Field, r string, pre string) {
 	}
 
 	if f.Tag != nil && f.Tag.FiledSize != nil {
-		_, _ = fmt.Fprintf(g.buf, "%s\t%sEle := make([]uint8, 0, %s)\n", pre, f.Name, *f.Tag.FiledSize)
+		_, _ = fmt.Fprintf(g.buf, "%s\t%sEle := make([]uint8, %s)\n", pre, f.Name, *f.Tag.FiledSize)
 		_, _ = fmt.Fprintf(g.buf, "%s\tcopy(%sEle, %s.%s)\n", pre, f.Name, r, f.Name)
 		_, _ = fmt.Fprintf(g.buf, "%s\tif err := binary.Write(buf, binary.LittleEndian, %sEle); err != nil {\n", pre, f.Name)
 		return
@@ -131,17 +131,12 @@ func (g *generator) filedDecodeGenerate(f *Field, r string, pre string) {
 		}
 
 		if f.Tag != nil && f.Tag.FiledSize != nil {
-			_, _ = fmt.Fprintf(g.buf, "%s\t%sEle := make([]uint8, 0, %s)\n", pre, f.Name, *f.Tag.FiledSize)
+			_, _ = fmt.Fprintf(g.buf, "%s\t%sEle := make([]uint8, %s)\n", pre, f.Name, *f.Tag.FiledSize)
 			_, _ = fmt.Fprintf(g.buf, "%s\tif err := binary.Read(buf, binary.LittleEndian, &%sEle); err == nil {\n", pre, f.Name)
 			_, _ = fmt.Fprintf(g.buf, "%s\t\t%s.%s = strings.TrimRight(string(%sEle), string(rune(0)))\n", pre, r, f.Name, f.Name)
 			_, _ = fmt.Fprintf(g.buf, "%s\t} else {\n", pre)
 			return
 		}
-		//UidEle := make([]uint8, 0, 20)
-		//	err := binary.Read(buf, binary.LittleEndian, &UidEle)
-		//	if err == nil {
-		//		u.Uid = strings.TrimRight(string(UidEle), string(rune(0)))
-		//	} else {
 	}
 
 	_, _ = fmt.Fprintf(g.buf, "%s\tif err := binary.Read(buf, binary.LittleEndian, &%s.%s); err != nil {\n", pre, r, f.Name)
@@ -167,7 +162,7 @@ func (g *generator) structDecodeGenerate(st *Struct) {
 					acc = *f.Tag.Access
 				}
 				_, _ = fmt.Fprintf(g.buf, "\n\tele_len := int(%s(%s.%s))\n", acc, r, *f.Tag.Repeat)
-				_, _ = fmt.Fprintf(g.buf, "\t%s.%s = make(%s, 0, ele_len)\n", r, f.Name, f.DataType)
+				_, _ = fmt.Fprintf(g.buf, "\t%s.%s = make(%s, ele_len)\n", r, f.Name, f.DataType)
 				_, _ = fmt.Fprintf(g.buf, "\tfor i := 0; i < ele_len; i++ {\n")
 				_, _ = fmt.Fprintf(g.buf, "\t\tvar ele %s\n", f.DataType[2:])
 				g.filedDecodeGenerate(f, r, "\t")
