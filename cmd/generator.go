@@ -171,7 +171,7 @@ func (g *generator) structDecodeGenerate(st *Struct) {
 				_, _ = fmt.Fprintf(g.buf, "\tfor i := 0; i < ele_len; i++ {\n")
 				_, _ = fmt.Fprintf(g.buf, "\t\tvar ele %s\n", f.DataType[2:])
 				g.filedDecodeGenerate(f, r, "\t")
-				_, _ = fmt.Fprintf(g.buf, "\t\t%s.%s = append(%s.%s, ele)\n", r, f.Name, r, f.Name)
+				_, _ = fmt.Fprintf(g.buf, "\t\t%s.%s[i] = ele\n", r, f.Name)
 				_, _ = fmt.Fprintf(g.buf, "\t}\n")
 				continue
 			}

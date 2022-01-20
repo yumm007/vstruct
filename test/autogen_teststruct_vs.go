@@ -53,7 +53,7 @@ func (s *Simples) decodeFromBuffer(buf *bytes.Buffer) error {
 		if err := binary.Read(buf, binary.LittleEndian, &ele); err != nil {
 			return err
 		}
-		s.Name = append(s.Name, ele)
+		s.Name[i] = ele
 	}
 
 	return nil
@@ -104,7 +104,7 @@ func (u *UnionSim) decodeFromBuffer(buf *bytes.Buffer) error {
 		if err := ele.decodeFromBuffer(buf); err != nil {
 			return err
 		}
-		u.Arr = append(u.Arr, ele)
+		u.Arr[i] = ele
 	}
 	if err := binary.Read(buf, binary.LittleEndian, &u.Crc); err != nil {
 		return err
