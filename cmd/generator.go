@@ -10,10 +10,11 @@ import (
 )
 
 type generator struct {
-	receiver string
-	hascrc16 bool
-	headBuf  *bytes.Buffer
-	buf      *bytes.Buffer
+	receiver   string
+	hascrc16   bool
+	hasstrings bool
+	headBuf    *bytes.Buffer
+	buf        *bytes.Buffer
 }
 
 func (g *generator) writeHeader(pkgName string) {
@@ -27,6 +28,9 @@ func (g *generator) writeHeader(pkgName string) {
 	_, _ = fmt.Fprintf(g.headBuf, "\t\"encoding/binary\"\n")
 	if g.hascrc16 {
 		_, _ = fmt.Fprintf(g.headBuf, "\t\"github.com/yumm007/gohash\"\n")
+	}
+	if g.hasstrings {
+		_, _ = fmt.Fprintf(g.headBuf, "\t\"strings\"\n")
 	}
 	_, _ = fmt.Fprintf(g.headBuf, ")\n\n")
 }
@@ -131,6 +135,7 @@ func (g *generator) filedDecodeGenerate(f *Field, r string, pre string) {
 		}
 
 		if f.Tag != nil && f.Tag.FiledSize != nil {
+			g.hasstrings = true
 			_, _ = fmt.Fprintf(g.buf, "%s\t%sEle := make([]uint8, %s)\n", pre, f.Name, *f.Tag.FiledSize)
 			_, _ = fmt.Fprintf(g.buf, "%s\tif err := binary.Read(buf, binary.LittleEndian, &%sEle); err == nil {\n", pre, f.Name)
 			_, _ = fmt.Fprintf(g.buf, "%s\t\t%s.%s = strings.TrimRight(string(%sEle), string(rune(0)))\n", pre, r, f.Name, f.Name)

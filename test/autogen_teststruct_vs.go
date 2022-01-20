@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"github.com/yumm007/gohash"
+	"strings"
 )
 
 
