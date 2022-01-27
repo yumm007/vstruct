@@ -44,9 +44,9 @@ func (g *generator) filedEncodeGenerate(f *Field, r string, pre string) {
 	if f.Tag != nil {
 		if f.Tag.Refer != nil {
 			if f.Tag.Repeat != nil {
-				_, _ = fmt.Fprintf(g.buf, "%s\tif err := %s.%s[i].encodeToBuffer(buf); err != nil {\n", pre, r, f.Name)
+				_, _ = fmt.Fprintf(g.buf, "%s\tif err := %s.%s[i].EncodeToBuffer(buf); err != nil {\n", pre, r, f.Name)
 			} else {
-				_, _ = fmt.Fprintf(g.buf, "%s\tif err := %s.%s.encodeToBuffer(buf); err != nil {\n", pre, r, f.Name)
+				_, _ = fmt.Fprintf(g.buf, "%s\tif err := %s.%s.EncodeToBuffer(buf); err != nil {\n", pre, r, f.Name)
 			}
 			return
 		} else if f.Tag.Repeat != nil {
@@ -76,7 +76,7 @@ func (g *generator) structEncodeGenerate(st *Struct) {
 		r = g.receiver
 	}
 
-	_, _ = fmt.Fprintf(g.buf, "\nfunc (%s *%s) encodeToBuffer(buf *bytes.Buffer) error {\n", r, st.Name)
+	_, _ = fmt.Fprintf(g.buf, "\nfunc (%s *%s) EncodeToBuffer(buf *bytes.Buffer) error {\n", r, st.Name)
 
 	for _, f := range st.Fields {
 		if f.Tag != nil && f.Tag.Crc16 != nil {
@@ -107,7 +107,7 @@ func (g *generator) structEncodeGenerate(st *Struct) {
 	_, _ = fmt.Fprintf(g.buf, "\t} else {\n")
 	_, _ = fmt.Fprintf(g.buf, "\t\tbuf.Reset()\n")
 	_, _ = fmt.Fprintf(g.buf, "\t}\n")
-	_, _ = fmt.Fprintf(g.buf, "\tif err := %s.encodeToBuffer(buf); err != nil {\n", r)
+	_, _ = fmt.Fprintf(g.buf, "\tif err := %s.EncodeToBuffer(buf); err != nil {\n", r)
 	_, _ = fmt.Fprintf(g.buf, "\t\treturn nil, err\n")
 	_, _ = fmt.Fprintf(g.buf, "\t}\n")
 	_, _ = fmt.Fprintf(g.buf, "\treturn buf.Bytes(), nil\n")
@@ -123,9 +123,9 @@ func (g *generator) filedDecodeGenerate(f *Field, r string, pre string) {
 	if f.Tag != nil {
 		if f.Tag.Refer != nil {
 			if f.Tag.Repeat != nil {
-				_, _ = fmt.Fprintf(g.buf, "%s\tif err := ele.decodeFromBuffer(buf); err != nil {\n", pre)
+				_, _ = fmt.Fprintf(g.buf, "%s\tif err := ele.DecodeFromBuffer(buf); err != nil {\n", pre)
 			} else {
-				_, _ = fmt.Fprintf(g.buf, "%s\tif err := %s.%s.decodeFromBuffer(buf); err != nil {\n", pre, r, f.Name)
+				_, _ = fmt.Fprintf(g.buf, "%s\tif err := %s.%s.DecodeFromBuffer(buf); err != nil {\n", pre, r, f.Name)
 			}
 
 			return
@@ -153,7 +153,7 @@ func (g *generator) structDecodeGenerate(st *Struct) {
 		r = g.receiver
 	}
 
-	_, _ = fmt.Fprintf(g.buf, "\nfunc (%s *%s) decodeFromBuffer(buf *bytes.Buffer) error {\n", r, st.Name)
+	_, _ = fmt.Fprintf(g.buf, "\nfunc (%s *%s) DecodeFromBuffer(buf *bytes.Buffer) error {\n", r, st.Name)
 
 	for _, f := range st.Fields {
 		if f.Tag != nil && f.Tag.Crc16 != nil {
@@ -192,7 +192,7 @@ func (g *generator) structDecodeGenerate(st *Struct) {
 
 	_, _ = fmt.Fprintf(g.buf, "\nfunc (%s *%s) Decode(payload []byte) error {\n", r, st.Name)
 	_, _ = fmt.Fprintf(g.buf, "\tbuf := bytes.NewBuffer(payload)\n")
-	_, _ = fmt.Fprintf(g.buf, "\treturn %s.decodeFromBuffer(buf)\n", r)
+	_, _ = fmt.Fprintf(g.buf, "\treturn %s.DecodeFromBuffer(buf)\n", r)
 	_, _ = fmt.Fprintf(g.buf, "}\n")
 }
 

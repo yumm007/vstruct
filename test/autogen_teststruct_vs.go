@@ -10,7 +10,7 @@ import (
 )
 
 
-func (s *Simples) encodeToBuffer(buf *bytes.Buffer) error {
+func (s *Simples) EncodeToBuffer(buf *bytes.Buffer) error {
 	if err := binary.Write(buf, binary.LittleEndian, &s.Id); err != nil {
 		return err
 	}
@@ -32,13 +32,13 @@ func (s *Simples) Encode(buf *bytes.Buffer) ([]byte, error) {
 	} else {
 		buf.Reset()
 	}
-	if err := s.encodeToBuffer(buf); err != nil {
+	if err := s.EncodeToBuffer(buf); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
 }
 
-func (s *Simples) decodeFromBuffer(buf *bytes.Buffer) error {
+func (s *Simples) DecodeFromBuffer(buf *bytes.Buffer) error {
 	if err := binary.Read(buf, binary.LittleEndian, &s.Id); err != nil {
 		return err
 	}
@@ -61,15 +61,15 @@ func (s *Simples) decodeFromBuffer(buf *bytes.Buffer) error {
 
 func (s *Simples) Decode(payload []byte) error {
 	buf := bytes.NewBuffer(payload)
-	return s.decodeFromBuffer(buf)
+	return s.DecodeFromBuffer(buf)
 }
 
-func (u *UnionSim) encodeToBuffer(buf *bytes.Buffer) error {
+func (u *UnionSim) EncodeToBuffer(buf *bytes.Buffer) error {
 	if err := binary.Write(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
 	for i := 0; i < int(int(u.Len)); i++ {
-		if err := u.Arr[i].encodeToBuffer(buf); err != nil {
+		if err := u.Arr[i].EncodeToBuffer(buf); err != nil {
 			return err
 		}
 	}
@@ -86,13 +86,13 @@ func (u *UnionSim) Encode(buf *bytes.Buffer) ([]byte, error) {
 	} else {
 		buf.Reset()
 	}
-	if err := u.encodeToBuffer(buf); err != nil {
+	if err := u.EncodeToBuffer(buf); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
 }
 
-func (u *UnionSim) decodeFromBuffer(buf *bytes.Buffer) error {
+func (u *UnionSim) DecodeFromBuffer(buf *bytes.Buffer) error {
 	if err := binary.Read(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (u *UnionSim) decodeFromBuffer(buf *bytes.Buffer) error {
 	u.Arr = make([]Simples, ele_len)
 	for i := 0; i < ele_len; i++ {
 		var ele Simples
-		if err := ele.decodeFromBuffer(buf); err != nil {
+		if err := ele.DecodeFromBuffer(buf); err != nil {
 			return err
 		}
 		u.Arr[i] = ele
@@ -115,14 +115,14 @@ func (u *UnionSim) decodeFromBuffer(buf *bytes.Buffer) error {
 
 func (u *UnionSim) Decode(payload []byte) error {
 	buf := bytes.NewBuffer(payload)
-	return u.decodeFromBuffer(buf)
+	return u.DecodeFromBuffer(buf)
 }
 
-func (u *UnionSim2) encodeToBuffer(buf *bytes.Buffer) error {
+func (u *UnionSim2) EncodeToBuffer(buf *bytes.Buffer) error {
 	if err := binary.Write(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
-	if err := u.Arr.encodeToBuffer(buf); err != nil {
+	if err := u.Arr.EncodeToBuffer(buf); err != nil {
 		return err
 	}
 	if err := binary.Write(buf, binary.LittleEndian, gohash.Crc16ccitt(buf.Bytes())); err != nil {
@@ -138,17 +138,17 @@ func (u *UnionSim2) Encode(buf *bytes.Buffer) ([]byte, error) {
 	} else {
 		buf.Reset()
 	}
-	if err := u.encodeToBuffer(buf); err != nil {
+	if err := u.EncodeToBuffer(buf); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
 }
 
-func (u *UnionSim2) decodeFromBuffer(buf *bytes.Buffer) error {
+func (u *UnionSim2) DecodeFromBuffer(buf *bytes.Buffer) error {
 	if err := binary.Read(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
-	if err := u.Arr.decodeFromBuffer(buf); err != nil {
+	if err := u.Arr.DecodeFromBuffer(buf); err != nil {
 		return err
 	}
 	if err := binary.Read(buf, binary.LittleEndian, &u.Crc); err != nil {
@@ -160,10 +160,10 @@ func (u *UnionSim2) decodeFromBuffer(buf *bytes.Buffer) error {
 
 func (u *UnionSim2) Decode(payload []byte) error {
 	buf := bytes.NewBuffer(payload)
-	return u.decodeFromBuffer(buf)
+	return u.DecodeFromBuffer(buf)
 }
 
-func (u *UnionSimAcc) encodeToBuffer(buf *bytes.Buffer) error {
+func (u *UnionSimAcc) EncodeToBuffer(buf *bytes.Buffer) error {
 	if err := binary.Write(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
@@ -183,13 +183,13 @@ func (u *UnionSimAcc) Encode(buf *bytes.Buffer) ([]byte, error) {
 	} else {
 		buf.Reset()
 	}
-	if err := u.encodeToBuffer(buf); err != nil {
+	if err := u.EncodeToBuffer(buf); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
 }
 
-func (u *UnionSimAcc) decodeFromBuffer(buf *bytes.Buffer) error {
+func (u *UnionSimAcc) DecodeFromBuffer(buf *bytes.Buffer) error {
 	if err := binary.Read(buf, binary.LittleEndian, &u.Len); err != nil {
 		return err
 	}
@@ -205,10 +205,10 @@ func (u *UnionSimAcc) decodeFromBuffer(buf *bytes.Buffer) error {
 
 func (u *UnionSimAcc) Decode(payload []byte) error {
 	buf := bytes.NewBuffer(payload)
-	return u.decodeFromBuffer(buf)
+	return u.DecodeFromBuffer(buf)
 }
 
-func (u *UnionString) encodeToBuffer(buf *bytes.Buffer) error {
+func (u *UnionString) EncodeToBuffer(buf *bytes.Buffer) error {
 	UidEle := make([]uint8, 20)
 	copy(UidEle, u.Uid)
 	if err := binary.Write(buf, binary.LittleEndian, UidEle); err != nil {
@@ -227,13 +227,13 @@ func (u *UnionString) Encode(buf *bytes.Buffer) ([]byte, error) {
 	} else {
 		buf.Reset()
 	}
-	if err := u.encodeToBuffer(buf); err != nil {
+	if err := u.EncodeToBuffer(buf); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
 }
 
-func (u *UnionString) decodeFromBuffer(buf *bytes.Buffer) error {
+func (u *UnionString) DecodeFromBuffer(buf *bytes.Buffer) error {
 	UidEle := make([]uint8, 20)
 	if err := binary.Read(buf, binary.LittleEndian, &UidEle); err == nil {
 		u.Uid = strings.TrimRight(string(UidEle), string(rune(0)))
@@ -249,5 +249,5 @@ func (u *UnionString) decodeFromBuffer(buf *bytes.Buffer) error {
 
 func (u *UnionString) Decode(payload []byte) error {
 	buf := bytes.NewBuffer(payload)
-	return u.decodeFromBuffer(buf)
+	return u.DecodeFromBuffer(buf)
 }
