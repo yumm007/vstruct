@@ -169,9 +169,17 @@ func (g *generator) structDecodeGenerate(st *Struct) {
 				_, _ = fmt.Fprintf(g.buf, "\n\tele_len := int(%s(%s.%s))\n", acc, r, *f.Tag.Repeat)
 				_, _ = fmt.Fprintf(g.buf, "\t%s.%s = make(%s, ele_len)\n", r, f.Name, f.DataType)
 				_, _ = fmt.Fprintf(g.buf, "\tfor i := 0; i < ele_len; i++ {\n")
-				_, _ = fmt.Fprintf(g.buf, "\t\tvar ele %s\n", f.DataType[2:])
+				if f.Tag.Point != nil {
+					_, _ = fmt.Fprintf(g.buf, "\t\tvar ele %s\n", f.DataType[3:]) // 去掉[]* 三个字符
+				} else {
+					_, _ = fmt.Fprintf(g.buf, "\t\tvar ele %s\n", f.DataType[2:])
+				}
 				g.filedDecodeGenerate(f, r, "\t")
-				_, _ = fmt.Fprintf(g.buf, "\t\t%s.%s[i] = ele\n", r, f.Name)
+				if f.Tag.Point != nil {
+					_, _ = fmt.Fprintf(g.buf, "\t\t%s.%s[i] = &ele\n", r, f.Name)
+				} else {
+					_, _ = fmt.Fprintf(g.buf, "\t\t%s.%s[i] = ele\n", r, f.Name)
+				}
 				_, _ = fmt.Fprintf(g.buf, "\t}\n")
 				continue
 			}
